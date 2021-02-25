@@ -1,6 +1,7 @@
 from settings import FREQUENCY_DELAY
 from os.path import dirname, join
 
+
 # This class loads a 'dictionary' of frequently used words and their frequency
 # and returns the corresponding delay length (in milliseconds) upon request
 class FrequencyDict(object):
@@ -16,12 +17,13 @@ class FrequencyDict(object):
                 word = split[0]
                 freq = int(split[1])
                 self.fd[word] = (freq, rank)
-        self.min_freq = min(self.fd.itervalues())
-        self.max_freq = max(self.fd.itervalues())
+        self.min_freq = min(self.fd.values())
+        self.max_freq = max(self.fd.values())
 
     def get_delay_words(self, text):
         freq, rank = self.fd.get(text, (0, len(self.fd)))
         return FREQUENCY_DELAY(freq, rank, self.min_freq, self.max_freq)
+
 
 try:
     from __main__ import __file__ as main_path

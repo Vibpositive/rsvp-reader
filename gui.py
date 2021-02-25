@@ -1,5 +1,5 @@
-import Tkinter as tki
-from tkFont import Font
+import tkinter as tki
+from tkinter.font import Font
 from wordfeed import WordFeed
 from settings import RSVP_FONT_DICT, RSVP_SHAPE
 from sys import platform
@@ -75,20 +75,20 @@ class Gui(object):
 
     def pause(self, event=None):
         self._pause_flag = True
-        print 'pause'
+        print('pause')
 
     def resume(self, event=None):
         self._pause_flag = False
-        print 'resume'
+        print('resume')
         self.rsvp_kernel()
 
     def back10(self, event=None):
-        print 'back 10'
+        print('back 10')
         self.wordfeed.inext -= 10
         self.update_rsvp()
 
     def back50(self, event=None):
-        print 'back 50'
+        print('back 50')
         self.wordfeed.inext -= 50
         self.update_rsvp()
 
