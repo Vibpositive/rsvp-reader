@@ -1,12 +1,13 @@
-import gui
+import newgui
+
 
 def main():
-    g = gui.Gui()
+    g = newgui.NewGui()
     try:
         g.master.mainloop()
     finally:
         pass
 
-if __name__=='__main__':
-    main()
 
+if __name__ == '__main__':
+    main()
