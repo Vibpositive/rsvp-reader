@@ -7,20 +7,25 @@ from settings import RSVP_FONT_DICT, RSVP_SHAPE, WPM
 from wordfeed import WordFeed
 
 master = tki.Tk()
+master.title('Window Title')
 
 
 class NewGui(object):
 
     def __init__(self):
         self.master = master
+        self.master.attributes('-alpha', 0.0)
         self._pause_flag = True
+        # self.master.geometry('{}x{}'.format(460, 350))
+        self.master.geometry('{}x{}'.format(600, 600))
+        # 
         #
         self.input_frame = InputFrame(self.master, self)
         self.input_frame.pack(side=tki.TOP)
         self.rsvp_frame = RsvpFrame(self.master, self)
         self.rsvp_frame.pack(side=tki.TOP)
         self.control_frame = ControlFrame(self.master, self)
-        self.control_frame.pack(side=tki.TOP)
+        # self.control_frame.pack(side=tki.TOP)
         self.rate_string = rs = tki.StringVar()
         self.rate_label = tki.Label(self.master, textvariable=rs)
         self.rate_label.pack(side=tki.TOP)
@@ -33,6 +38,8 @@ class NewGui(object):
         #
         # self.apply_settings()
         # self.pause_resume()
+        center(self.master)
+        self.master.attributes('-alpha', 1.0)
 
     def apply_settings(self):
         pass
@@ -72,7 +79,7 @@ class NewGui(object):
         if self._pause_flag:
             return
         self.update_rsvp()
-        delay_ms = ceil(60000/350)
+        delay_ms = ceil(60000 / 350)
         print(delay_ms)
         if delay_ms:
             self.master.after(delay_ms, self.rsvp_kernel)
@@ -124,6 +131,22 @@ Donec rutrum euismod vehicula. Vestibulum ante ipsum primis in faucibus orci luc
         return 'break'
 
 
+def center(root):
+    root.update_idletasks()
+    width = root.winfo_width()
+    height = root.winfo_height()
+
+    frm_width = root.winfo_rootx() - root.winfo_x()
+    win_width = width + 2 * frm_width
+    title_bar_height = root.winfo_rooty() - root.winfo_y()
+    win_height = height + title_bar_height + frm_width
+    x = root.winfo_screenwidth() // 2 - win_width // 2
+    y = (root.winfo_screenheight() // 2 - win_height // 2) - 75
+
+    root.geometry('{}x{}+{}+{}'.format(width, height, x, y))
+    root.deiconify()
+
+
 class RsvpFrame(tki.Frame):
     def __init__(self, master, gui):
         tki.Frame.__init__(self, master)
@@ -140,8 +163,6 @@ class RsvpFrame(tki.Frame):
         self.canvas.bind('<Button-1>', self.gui.pause_resume)
 
     def display_text(self, text):
-        # width, height = self.shape
-
         middle = (len(text) + 1) // 2
 
         self.canvas.itemconfigure(self.t1, text=text[:middle - 1] + ' ')
@@ -151,26 +172,59 @@ class RsvpFrame(tki.Frame):
 
 class ControlFrame(tki.Frame):
     def __init__(self, __master, gui):
-        tki.Frame.__init__(self, __master)
-        self.gui = gui
+
+        tki.Frame.__init__(self, __master, bg='yellow', width=600, height=100, pady=3)
+
+        self.master.grid_rowconfigure(0, weight=1)
+        self.master.grid_rowconfigure(1, weight=1)
+        self.master.grid_rowconfigure(2, weight=1)
+
+        self.master.grid_columnconfigure(0, weight=1)
+        self.master.grid_columnconfigure(1, weight=1)
+        self.master.grid_columnconfigure(2, weight=1)
+
+        self.pack_propagate(False)
+        self.master.pack_propagate(False)
+
+        self.grid(column=0, row=2, sticky="nsew", columnspan=3)
+
+        self.grid_columnconfigure(0, weight=1)
+        self.grid_columnconfigure(1, weight=1)
+        self.grid_columnconfigure(2, weight=1)
+
+        self.grid_rowconfigure(0, weight=1)
+        self.grid_rowconfigure(1, weight=1)
+        self.grid_rowconfigure(2, weight=1)
 
         #
+        self.gui = gui
+
+        for r in range(3):
+            for c in range(3):
+                tki.Label(self, text='R%s/C%s' % (r, c), borderwidth=1).grid(row=r, column=c)
+
         b = self.pause_button = tki.Button(
             self,
             text='Play/Pause',
             command=gui.pause_resume)
-        b.pack(side=tki.LEFT)
+        b.grid(column=0, row=0)
 
-        #
         b = self.back10_button = tki.Button(
             self,
             text='< 10',
             command=gui.back10)
-        b.pack(side=tki.LEFT)
+        b.grid(column=1, row=0)
 
-        #
         b = self.back50_button = tki.Button(
             self,
             text='< 50',
             command=gui.back50)
-        b.pack(side=tki.LEFT)
+        b.grid(column=2, row=0)
+
+        # wpm.set(WPM)
+        # wpm = tki.IntVar(self.master)
+        # spin = tki.Spinbox(self, from_=1, to=999, textvariable=wpm)
+        spin = tki.Spinbox(self, from_=1, to=999)
+        spin.grid(column=1, row=1)
+def nothing():
+    print("nothing")

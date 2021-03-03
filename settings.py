@@ -8,4 +8,4 @@ RSVP_FONT_DICT = {
 }
 
 # Dimensions of the RSVP display box in pixels (width, height)
-RSVP_SHAPE = (600, 100)
+RSVP_SHAPE = (600, 230)
