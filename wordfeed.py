@@ -10,7 +10,12 @@ class WordFeed(object):
 
     def get_statistics(self):
         num_words = len(self.text_tuple)
-        total_minutes = num_words / WPM
+        total_minutes = (num_words / WPM) * 60000
+        return num_words, total_minutes
+
+    def update_statistics(self, wpm):
+        num_words = len(self.text_tuple)
+        total_minutes = (num_words / wpm)
         return num_words, total_minutes
 
     def next(self):

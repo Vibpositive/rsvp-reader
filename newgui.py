@@ -1,4 +1,5 @@
 import tkinter as tki
+from decimal import getcontext, Decimal
 from math import ceil
 from sys import platform
 from tkinter.font import Font
@@ -8,6 +9,7 @@ from wordfeed import WordFeed
 
 master = tki.Tk()
 master.title('Window Title')
+getcontext().prec = 4
 
 
 class NewGui(object):
@@ -15,8 +17,9 @@ class NewGui(object):
     def __init__(self):
         self.master = master
         self.master.attributes('-alpha', 0.0)
+        self.master.WPM = WPM
         self._pause_flag = True
-        # self.master.geometry('{}x{}'.format(460, 350))
+        self.master.geometry('{}x{}'.format(460, 350))
         self.master.geometry('{}x{}'.format(600, 600))
         # 
         #
@@ -25,7 +28,6 @@ class NewGui(object):
         self.rsvp_frame = RsvpFrame(self.master, self)
         self.rsvp_frame.pack(side=tki.TOP)
         self.control_frame = ControlFrame(self.master, self)
-        # self.control_frame.pack(side=tki.TOP)
         self.rate_string = rs = tki.StringVar()
         self.rate_label = tki.Label(self.master, textvariable=rs)
         self.rate_label.pack(side=tki.TOP)
@@ -35,6 +37,8 @@ class NewGui(object):
         # #
         self.wordfeed = None
         self.update_wordfeed()
+        self.control_frame.set_update_wpm()
+        self.counter = 0
         #
         # self.apply_settings()
         # self.pause_resume()
@@ -55,21 +59,23 @@ class NewGui(object):
         self.update_rate()
 
     def update_rate(self):
-        num_words, total_minutes = self.wordfeed.get_statistics()
+
+        num_words, total_minutes = self.wordfeed.update_statistics(self.master.WPM)
         if num_words < 1:
             return
-        stat_format = '{0} words in {1:.2f} minutes = {2} WPM.'
+        stat_format = '{0} words in {1:.2f} minutes = {2} WPM. or {3} seconds'
         self.rate_string.set(
             stat_format.format(
                 num_words,
                 total_minutes,
-                WPM
+                self.master.WPM,
+                Decimal(total_minutes) * Decimal(60)
             )
         )
 
     def update_rsvp(self):
         text = self.wordfeed.next()
-        print("next word:", text)
+        # print("next word:", text)
         if text is None:
             self.pause()
         else:
@@ -79,8 +85,10 @@ class NewGui(object):
         if self._pause_flag:
             return
         self.update_rsvp()
-        delay_ms = ceil(60000 / 350)
-        print(delay_ms)
+        delay_ms = ceil(60000 / self.master.WPM)
+        print("delay_ms", delay_ms, "self.counter", self.counter)
+        self.counter = self.counter + 1
+        # TODO: reset counter
         if delay_ms:
             self.master.after(delay_ms, self.rsvp_kernel)
 
@@ -195,6 +203,7 @@ class ControlFrame(tki.Frame):
         self.grid_rowconfigure(0, weight=1)
         self.grid_rowconfigure(1, weight=1)
         self.grid_rowconfigure(2, weight=1)
+        self.wpm = tki.IntVar(self.master)
 
         #
         self.gui = gui
@@ -221,10 +230,20 @@ class ControlFrame(tki.Frame):
             command=gui.back50)
         b.grid(column=2, row=0)
 
-        # wpm.set(WPM)
-        # wpm = tki.IntVar(self.master)
-        # spin = tki.Spinbox(self, from_=1, to=999, textvariable=wpm)
-        spin = tki.Spinbox(self, from_=1, to=999)
+        spin = tki.Spinbox(self, from_=1, to=999, textvariable=self.wpm)
         spin.grid(column=1, row=1)
-def nothing():
-    print("nothing")
+
+    def set_update_wpm(self):
+        self.wpm.set(self.master.WPM)
+        self.wpm.trace('w', self.update_wpm)
+
+    def update_wpm(self, *args):
+        try:
+            self.master.WPM = self.wpm.get()
+            self.gui.update_wordfeed()
+            self.gui.update_rate()
+        except tki.TclError as e:
+            if e == 'expected floating-point number but got ""':
+                print("User erased spin")
+                exit(99)
+#                 TODO: add flag to not execute reader
