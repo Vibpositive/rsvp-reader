@@ -1,5 +1,5 @@
 # How many words per minute.
-WPM = 900
+WPM = 5108
 
 # Font to display RSVP text
 RSVP_FONT_DICT = {
