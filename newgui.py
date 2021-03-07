@@ -1,5 +1,4 @@
 import tkinter as tki
-from decimal import getcontext, Decimal
 from math import ceil
 from sys import platform
 from tkinter.font import Font
@@ -9,7 +8,6 @@ from wordfeed import WordFeed
 
 master = tki.Tk()
 master.title('Window Title')
-getcontext().prec = 4
 
 
 class NewGui(object):
@@ -32,20 +30,10 @@ class NewGui(object):
         self.control_frame = ControlFrame(self.master, self)
 
         self.rate_string = tki.StringVar()
-        self.rate_seconds = rate_seconds = tki.StringVar()
-        self.time_elapsed = time_elapsed = tki.StringVar()
+        self.rate_seconds = tki.StringVar()
+        self.time_elapsed = tki.StringVar()
         self.time_elapsed_int = int(0)
         self.display_frame = DisplayFrame(self.master, self)
-
-        # self.rate_label = tki.Label(self.master, textvariable=rs)
-        # self.rate_seconds_label = tki.Label(self.master, textvariable=rate_seconds)
-        # self.time_elapsed_label = tki.Label(self.master, textvariable=time_elapsed)
-
-        # self.rate_label.pack(side=tki.TOP)
-        # self.rate_seconds_label.pack(side=tki.TOP)
-        # self.time_elapsed_label.pack(side=tki.TOP)
-
-        # self.rate_label.grid(column=1, row=0, sticky="nsew", columnspan=3)
 
         # #
         self.master.bind('<Escape>', lambda e: self.master.destroy())
@@ -83,9 +71,6 @@ class NewGui(object):
         self.update_rate()
 
     def update_rate(self):
-
-        print("update_rate")
-
         num_words, total_minutes = self.wordfeed.update_statistics(self.master.WPM)
         if num_words < 1:
             return
@@ -95,27 +80,23 @@ class NewGui(object):
                 num_words,
                 total_minutes,
                 self.master.WPM,
-                Decimal(total_minutes * 60)
+                "%.1f" % (total_minutes * 60)
             )
         )
 
         seconds_format = '{0} seconds'
         divisor = 1
 
-        print("(total_minutes * 60)", (total_minutes * 60))
-
         if 60 <= (total_minutes * 60) < 3600:
             seconds_format = '{0} minutes'
             divisor = 60
-            # print((total_minutes * 60))
         elif (total_minutes * 60) >= 3600:
             seconds_format = '{0} hours'
             divisor = 3600
 
         self.rate_seconds.set(
             seconds_format.format(
-                # Decimal(total_minutes * 60)
-                "%.1f" % ((total_minutes * 60) / divisor)
+                "%.9f" % ((total_minutes * 60) / divisor)
             )
         )
 
@@ -128,32 +109,30 @@ class NewGui(object):
             self.rsvp_frame.display_text(text)
 
     def rsvp_kernel(self):
-        if self._pause_flag:
-            return
         self.update_rsvp()
 
-        delay_ms = ceil(60000 / self.master.WPM)
+        if self._pause_flag:
+            return
+
+
+
+        delay_ms = (60000 / self.master.WPM)
 
         self.counter = self.counter + 1
-        self.time_elapsed_int += Decimal(delay_ms)
+        self.time_elapsed_int += delay_ms
 
-        # print("time_elapsed_int", self.time_elapsed_int)
-        # print("%.1f" %  (self.time_elapsed_int * Decimal(0.001)))
-        # print(self.time_elapsed_int * Decimal(0.001)))
-        time_elapsed_format = '{0} seconds'
 
-        self.time_elapsed.set(
-            time_elapsed_format.format(
-                # self.time_elapsed_int * Decimal(0.001)
-                "%.1f" % (self.time_elapsed_int * Decimal(0.001))
-            )
-        )
-
-        # print("delay_ms", delay_ms, "self.counter", self.counter, "self.time_elapsed_int",
-        #       self.time_elapsed_int)
         # TODO: reset counter
         if delay_ms:
-            self.master.after(delay_ms, self.rsvp_kernel)
+            self.master.after(int(delay_ms), self.rsvp_kernel)
+            time_elapsed_format = '{0} seconds'
+
+            self.time_elapsed.set(
+                time_elapsed_format.format(
+                    "%.9f" % (self.time_elapsed_int * 0.001)
+                )
+            )
+            print('time_elapsed_int',self.time_elapsed_int, 'self.time_elapsed_int * 0.001', self.time_elapsed_int * 0.001)
 
     def pause_resume(self, event=None):
         if self._pause_flag:
