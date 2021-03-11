@@ -1,8 +1,9 @@
-import newgui
-
+# import newgui
+# from com.vibpositive.gui.gui import Gui
+import com.vibpositive.gui.gui as gui
 
 def main():
-    g = newgui.NewGui()
+    g = gui.MainGui()
     try:
         g.master.mainloop()
     finally:
