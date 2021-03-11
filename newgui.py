@@ -1,5 +1,4 @@
 import tkinter as tki
-from math import ceil
 from sys import platform
 from tkinter.font import Font
 
@@ -96,7 +95,7 @@ class NewGui(object):
 
         self.rate_seconds.set(
             seconds_format.format(
-                "%.9f" % ((total_minutes * 60) / divisor)
+                "%.1f" % ((total_minutes * 60) / divisor)
             )
         )
 
@@ -114,13 +113,10 @@ class NewGui(object):
         if self._pause_flag:
             return
 
-
-
         delay_ms = (60000 / self.master.WPM)
 
         self.counter = self.counter + 1
         self.time_elapsed_int += delay_ms
-
 
         # TODO: reset counter
         if delay_ms:
@@ -129,10 +125,11 @@ class NewGui(object):
 
             self.time_elapsed.set(
                 time_elapsed_format.format(
-                    "%.9f" % (self.time_elapsed_int * 0.001)
+                    "%.1f" % (self.time_elapsed_int * 0.001)
                 )
             )
-            print('time_elapsed_int',self.time_elapsed_int, 'self.time_elapsed_int * 0.001', self.time_elapsed_int * 0.001)
+            # print('time_elapsed_int', self.time_elapsed_int, 'self.time_elapsed_int * 0.001',
+            #       self.time_elapsed_int * 0.001)
 
     def pause_resume(self, event=None):
         if self._pause_flag:
@@ -152,11 +149,12 @@ class NewGui(object):
     def back10(self, event=None):
         # print('back 10')
         self.wordfeed.inext -= 10
+        # self.wordfeed.i()
         self.update_rsvp()
 
     def back50(self, event=None):
         # print('back 50')
-        self.wordfeed.inext = 1
+        self.wordfeed.inext -= 50
         self.update_rsvp()
 
 
