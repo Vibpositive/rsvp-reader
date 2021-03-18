@@ -1,5 +1,6 @@
 import tkinter as tki
 from sys import platform
+from tkinter import filedialog
 from tkinter.font import Font
 
 from settings import RSVP_FONT_DICT, RSVP_SHAPE, WPM
@@ -11,7 +12,8 @@ master.title('Window Title')
 
 class MainGui(object):
 
-    def __init__(self):
+    def __init__(self, logger):
+        self.logger = logger
         self.master = master
         self.master.attributes('-alpha', 0.0)
         self.master.WPM = WPM
@@ -63,6 +65,7 @@ class MainGui(object):
         pass
 
     def update_wordfeed(self, name=None, index=None, mode=None):
+        self.logger.debug('This message should go to the log file')
         inext = self.wordfeed.inext if self.wordfeed else 0
         text = self.input_frame.entry.get()
         self.wordfeed = WordFeed(text, inext)
@@ -230,6 +233,12 @@ class DisplayFrame(tki.Frame):
         self.rate_seconds_label.pack(side=tki.TOP)
         self.time_elapsed_label.pack(side=tki.TOP)
 
+        self.label_open_file = tki.Label(
+            self,
+            text="File Explorer using Tkinter",
+            fg="blue")
+        self.label_open_file.grid(column=0, row=2)
+
 
 class ControlFrame(tki.Frame):
     def __init__(self, __master, gui):
@@ -261,9 +270,9 @@ class ControlFrame(tki.Frame):
         #
         self.gui = gui
 
-        for r in range(3):
-            for c in range(3):
-                tki.Label(self, text='R%s/C%s' % (r, c), borderwidth=1).grid(row=r, column=c)
+        # for r in range(3):
+        #     for c in range(3):
+        #         tki.Label(self, text='R%s/C%s' % (r, c), borderwidth=1).grid(row=r, column=c)
 
         b = self.pause_button = tki.Button(
             self,
@@ -286,6 +295,24 @@ class ControlFrame(tki.Frame):
         spin = tki.Spinbox(self, from_=1, to=999, textvariable=self.wpm)
         spin.grid(column=1, row=1)
 
+        button_explore = tki.Button(self,
+                                    text="Browse Files",
+                                    command=self.browseFiles)
+
+        button_exit = tki.Button(self,
+                                 text="Exit",
+                                 command=exit)
+
+        # Grid method is chosen for placing
+        # the widgets at respective positions
+        # in a table like structure by
+        # specifying rows and columns
+
+
+        button_explore.grid(column=1, row=2)
+
+        button_exit.grid(column=2, row=2)
+
     def set_update_wpm(self):
         self.wpm.set(self.master.WPM)
         self.wpm.trace('w', self.update_wpm)
@@ -299,4 +326,9 @@ class ControlFrame(tki.Frame):
             if e == 'expected floating-point number but got ""':
                 print("User erased spin")
                 exit(99)
-#                 TODO: add flag to not execute reader
+
+    # TODO: add flag to not execute reader
+    def browseFiles(self):
+        filename = filedialog.askopenfilename(filetypes=[('Epub files', '.epub')])
+
+        self.gui.display_frame.label_open_file.configure(text="File Opened: " + filename)

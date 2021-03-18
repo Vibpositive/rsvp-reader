@@ -4,6 +4,7 @@ from pathlib import Path
 import ebooklib
 from bs4 import BeautifulSoup
 from ebooklib import epub
+import time
 
 
 # there may be more elements you don't want, such as "style", etc.
@@ -52,6 +53,7 @@ class Reader(object):
 
     def set_author(self):
         self.authors = self.book.get_metadata('DC', 'creator')
+        print(self.book.get_metadata('DC', 'identifier'))
 
     def set_title(self):
         self.title = self.book.get_metadata('DC', 'title')[0][0]
@@ -89,4 +91,18 @@ class Reader(object):
         self.book_path = book
         self.book = epub.read_epub(book)
 
-# reader = Reader('../../../../epub/ebook.epub')
+
+reader = Reader('../../../../epub/ebook.epub')
+for i, chapter in enumerate(reader.text_chapters):
+    if i < 10:
+        lista = chapter.split(' ')
+        stripped_list = [line.strip() for line in [line.strip() for line in lista] if line != ""]
+        print(stripped_list)
+
+
+
+# for chapter in reader.text_chapters:
+#     time.sleep(0.02)
+#     print(chapter[0])
+# for word in chapter:
+#     print (word)

@@ -1,9 +1,13 @@
-# import newgui
-# from com.vibpositive.gui.gui import Gui
 import com.vibpositive.gui.gui as gui
+import logging
+import logging.config
+
+logging.config.fileConfig('com/vibpositive/config/logging.conf')
+
 
 def main():
-    g = gui.MainGui()
+    logger = logging.getLogger('file')
+    g = gui.MainGui(logger)
     try:
         g.master.mainloop()
     finally:
