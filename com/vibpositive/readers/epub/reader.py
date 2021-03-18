@@ -4,10 +4,7 @@ from pathlib import Path
 import ebooklib
 from bs4 import BeautifulSoup
 from ebooklib import epub
-import time
 
-
-# there may be more elements you don't want, such as "style", etc.
 
 class Reader(object):
 
@@ -19,23 +16,20 @@ class Reader(object):
         self.html_chapters = None
         self.title = None
         self.authors = None
-        self.book_path = None
         self.library_dir = "/tmp/"
-        self.book = None
-
-        self.read_book(book)
-        self.set_title()
-        self.set_author()
-        self.create_books_dir()
-        self.epubtohtml()
-        self.epub_to_text()
+        self.book = book
+        self.epub_book = None
 
     def epubtohtml(self):
         chapters = []
-        for item in self.book.get_items():
-            if item.get_type() == ebooklib.ITEM_DOCUMENT:
-                chapters.append(item.get_content())
-        self.html_chapters = chapters
+        try:
+            for item in self.epub_book.get_items():
+                if item.get_type() == ebooklib.ITEM_DOCUMENT:
+                    chapters.append(item.get_content())
+            self.html_chapters = chapters
+        except AttributeError as e:
+            # TODO log
+            pass
 
     def chapter_to_text(self, chap):
         output = ''
@@ -52,15 +46,15 @@ class Reader(object):
             self.text_chapters.append(text.rstrip("\n"))
 
     def set_author(self):
-        self.authors = self.book.get_metadata('DC', 'creator')
-        print(self.book.get_metadata('DC', 'identifier'))
+        self.authors = self.epub_book.get_metadata('DC', 'creator')
+        print(self.epub_book.get_metadata('DC', 'identifier'))
 
     def set_title(self):
-        self.title = self.book.get_metadata('DC', 'title')[0][0]
+        self.title = self.epub_book.get_metadata('DC', 'title')[0][0]
 
     def create_books_dir(self):
         try:
-            if self.book_path.endswith('epub'):
+            if self.book.endswith('epub'):
 
                 authors = ""
 
@@ -75,7 +69,7 @@ class Reader(object):
                         os.makedirs(path)
                     except OSError as e:
                         # TODO Log
-                        print(e)
+                        pass
                     else:
                         print("Successfully created the directory %s " % path)
 
@@ -83,26 +77,13 @@ class Reader(object):
             if e.errno != 17:
                 raise e
 
-    # def book_to_json(self, book):
-    #     with open("sample.json", "w") as outfile:
-    #         json.dump(book, outfile)
-
-    def read_book(self, book):
-        self.book_path = book
-        self.book = epub.read_epub(book)
+    def read_book(self):
+        self.epub_book = epub.read_epub(self.book)
 
 
-reader = Reader('../../../../epub/ebook.epub')
-for i, chapter in enumerate(reader.text_chapters):
-    if i < 10:
-        lista = chapter.split(' ')
-        stripped_list = [line.strip() for line in [line.strip() for line in lista] if line != ""]
-        print(stripped_list)
-
-
-
-# for chapter in reader.text_chapters:
-#     time.sleep(0.02)
-#     print(chapter[0])
-# for word in chapter:
-#     print (word)
+# reader = Reader('../../../../epub/ebook.epub')
+# for i, chapter in enumerate(reader.text_chapters):
+#     if i < 10:
+#         lista = chapter.split(' ')
+#         stripped_list = [line.strip() for line in [line.strip() for line in lista] if line != ""]
+#         print(stripped_list)
