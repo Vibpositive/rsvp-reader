@@ -19,7 +19,7 @@ class Reader(object):
         self.library_dir = "/tmp/"
         self.book = book
         self.epub_book = None
-
+    # Sets chapters in html
     def epubtohtml(self):
         chapters = []
         try:
@@ -29,6 +29,7 @@ class Reader(object):
             self.html_chapters = chapters
         except AttributeError as e:
             # TODO log
+            print('invalid ebook')
             pass
 
     def chapter_to_text(self, chap):
@@ -41,8 +42,8 @@ class Reader(object):
         return output
 
     def epub_to_text(self):
-        for html in self.html_chapters:
-            text = self.chapter_to_text(html)
+        for html_chapter in self.html_chapters:
+            text = self.chapter_to_text(html_chapter)
             self.text_chapters.append(text.rstrip("\n"))
 
     def set_author(self):
@@ -78,7 +79,12 @@ class Reader(object):
                 raise e
 
     def read_book(self):
-        self.epub_book = epub.read_epub(self.book)
+        try:
+            self.epub_book = epub.read_epub(self.book)
+        except Exception as e:
+            print(e)
+            pass
+        # TODO log
 
 
 # reader = Reader('../../../../epub/ebook.epub')
