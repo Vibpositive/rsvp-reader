@@ -5,7 +5,8 @@ from reader import *
 class TestReader(TestCase):
     @classmethod
     def setUpClass(cls):
-        cls.reader = Reader('../../../../epub/ebook.epub')
+        cls.book = '../../../../epub/ebook.epub'
+        cls.reader = Reader(cls.book)
         cls.reader.read_book()
 
     @classmethod
@@ -50,15 +51,46 @@ class TestReader(TestCase):
         for text_chapter in self.reader.text_chapters:
             self.assertNotIn('<!DOCTYPE html>', text_chapter)
 
-
     def test_set_author(self):
-        self.fail()
+        expected = 'Dan Harris'
+        self.reader = Reader('../../../../epub/ebook.epub')
+        self.reader.read_book()
+        self.reader.set_author()
+        # TODO test with larger samples
+        self.assertEqual(self.reader.authors[0], expected)
 
-    def test_set_title(self):
-        self.fail()
+    def test_negative_set_author(self):
+        self.reader = Reader('../../../../epub/ebook.epub')
+        self.reader.set_author()
+        self.assertIsNone(self.reader.authors)
 
     def test_create_books_dir(self):
-        self.fail()
+        self.reader.read_book()
+        self.reader.set_author()
+        self.reader.set_title()
+        self.reader.create_books_dir()
+        for author in self.reader.authors:
+            self.assertIn(author, os.listdir(f"{os.getenv('HOME')}/rsvp/"))
 
     def test_read_book(self):
-        self.fail()
+        filename = "hello_world.epub"
+        filestream = open(filename, 'w')
+        filestream.close()
+
+        self.reader = Reader(filename)
+        self.reader.read_book()
+        self.assertIsNone(self.reader.epub_book)
+
+    def test_set_title(self):
+        expected = '10% mais feliz: Como aprendi a silenciar a mente, reduzi o estresse e encontrei o caminho para a ' \
+                   'felicidade - Uma história real'
+        self.reader = Reader('../../../../epub/ebook.epub')
+        self.reader.read_book()
+        self.reader.set_title()
+        # TODO test with larger samples
+        self.assertEqual(self.reader.title, expected)
+
+    def test_negative_set_title(self):
+        self.reader = Reader('../../../../epub/ebook.epub')
+        self.reader.set_title()
+        self.assertIsNone(self.reader.authors)
