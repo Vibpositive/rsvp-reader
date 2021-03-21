@@ -64,14 +64,6 @@ class TestReader(TestCase):
         self.reader.set_author()
         self.assertIsNone(self.reader.authors)
 
-    def test_create_books_dir(self):
-        self.reader.read_book()
-        self.reader.set_author()
-        self.reader.set_title()
-        self.reader.create_books_dir()
-        for author in self.reader.authors:
-            self.assertIn(author, os.listdir(f"{os.getenv('HOME')}/rsvp/"))
-
     def test_read_book(self):
         filename = "hello_world.epub"
         filestream = open(filename, 'w')

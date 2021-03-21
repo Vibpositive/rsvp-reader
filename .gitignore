@@ -3,6 +3,5 @@ venv
 examples
 .DS_STORE
 *.epub
-*
 .log
 epub/

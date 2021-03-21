@@ -64,40 +64,40 @@ class Reader(object):
             print('no title')
             pass
 
-    def create_books_dir(self):
-        try:
-            if self.book.endswith('epub'):
-
-                authors = "".join(self.authors)
-                authors_path = f"{os.getenv('HOME')}/rsvp/" + authors + os.sep + str(self.title)
-                path = Path(authors_path)
-
-                if not os.path.exists(path):
-                    try:
-                        os.makedirs(path)
-                    except OSError as e:
-                        # TODO Log
-                        pass
-                    else:
-                        # TODO Log
-                        print("Successfully created the directory %s " % path)
-
-        except IOError as e:
-            if e.errno != 17:
-                raise e
-        except TypeError as e:
-            # TODO Log
-            print(e)
-        except Exception as e:
-            # TODO Unknow exception log
-            print("unknown error: ", e)
+    # def create_books_dir(self):
+    #     try:
+    #         if self.book.endswith('epub'):
+    #
+    #             authors = "".join(self.authors)
+    #             authors_path = f"{os.getenv('HOME')}/rsvp/" + authors + os.sep + str(self.title)
+    #             path = Path(authors_path)
+    #
+    #             if not os.path.exists(path):
+    #                 try:
+    #                     os.makedirs(path)
+    #                 except OSError as e:
+    #                     # TODO Log
+    #                     pass
+    #                 else:
+    #                     # TODO Log
+    #                     print("Successfully created the directory %s " % path)
+    #
+    #     except IOError as e:
+    #         if e.errno != 17:
+    #             raise e
+    #     except TypeError as e:
+    #         # TODO Log
+    #         print(e)
+    #     except Exception as e:
+    #         # TODO Unknow exception log
+    #         print("unknown error: ", e)
 
     def read_book(self):
         try:
             self.epub_book = epub.read_epub(self.book)
         except Exception as e:
             # TODO log
-            print(e)
+            print('error while reading book', e)
             pass
 
 

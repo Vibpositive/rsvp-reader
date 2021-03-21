@@ -1,6 +1,6 @@
 import subprocess
 
-
+# TODO unit test
 def get_max_characters():
     try:
         name_max = subprocess.check_output("getconf NAME_MAX /", shell=True)
