@@ -37,8 +37,13 @@ class TestDAO(TestCase):
         expected = 400
         set_book_progress(self.book, expected)
         actual = get_book_progress(self.book)
-
         self.assertEqual(actual, expected)
+
+    def test_negative_get_book_progress(self):
+        expected = 400
+        book = {'author': 'John Doe', 'title': 'Some title that does not exist'}
+        set_book_progress(self.book, expected)
+        self.assertIsNone(get_book_progress(book))
 
     def test_positive_get_books_by_author(self):
         expected = str(self.book['title'])

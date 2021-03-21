@@ -50,8 +50,6 @@ class Reader(object):
     def set_author(self):
         try:
             # TODO test with a large number of samples
-            # for author in self.epub_book.get_metadata('DC', 'creator'):
-            #     print('author', author[0])
             self.authors = [author[0] for author in self.epub_book.get_metadata('DC', 'creator')]
         except Exception:
             # TODO log
